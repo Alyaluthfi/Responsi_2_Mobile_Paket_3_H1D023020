@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "230053950682",
+    "project_id": "responsi2-h1d023020",
+    "storage_bucket": "responsi2-h1d023020.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230053950682:android:a8e84b8a25d2b9f0a0a1e3",
+        "android_client_info": {
+          "package_name": "com.company.responsi2_h1d023020"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGuOYeyk3F8fJCdt4ihwRZLzfvCTzyFfc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
