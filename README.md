@@ -1,6 +1,6 @@
-# h1d023020_responsi2_paket3
+# H1D023020_responsi2_paket3
 
-# Analisis Proyek Responsi 2 - Inventaris Buku Firebase
+# Analisis Proyek Responsi 2 - Inventaris Buku 
 
 Proyek ini adalah aplikasi Mobile untuk manajemen inventaris buku (Aluthmart) yang dibangun menggunakan Flutter dan terintegrasi dengan Firebase. Aplikasi ini mendemonstrasikan implementasi Autentikasi dan alur manipulasi data (CRUD) yang tersinkronisasi secara Real-time.
 
@@ -17,123 +17,156 @@ Proyek ini adalah aplikasi Mobile untuk manajemen inventaris buku (Aluthmart) ya
 
 ---
 
-##  📱Demo Aplikasi 
+## 🎥 Video Demo Aplikasi
+![Demo Aplikasi Responsi 2 Paket 3](assets/Demo_Aplikasi.gif)
 
-Berikut adalah link video demo penggunaan aplikasi:
 
-![Demo Aplikasi Responsi 2 Paket #](assets/Demo_Aplikasi.gif)
+---
+
+## 📡 Spesifikasi API (Firebase SDK)
+
+Aplikasi ini tidak menggunakan REST API konvensional, melainkan Firebase SDK yang langsung berkomunikasi ke Google Cloud.
+
+---
+
+## 1. Authentication API
+
+Digunakan untuk mengelola akses pengguna.
+
+| Fungsi/Method | Kegunaan | Ekuivalen REST API |
+|---------------|----------|-------------------|
+| signInWithEmailAndPassword | Verifikasi email & password. Mengembalikan token sesi. | POST /login |
+| createUserWithEmailAndPassword | Membuat akun baru di Firebase. | POST /register |
+| signOut | Menghapus token sesi di perangkat. | POST /logout |
+
+---
+
+## 2. Firestore Database API
+
+Digunakan untuk manipulasi data buku dalam koleksi `books`.
+
+**Collection Reference:** `books`
+
+| Operasi | Method SDK | Deskripsi Teknis |
+|---------|-------------|------------------|
+| READ (Realtime) | `.snapshots()` | Membuka koneksi WebSocket permanen untuk streaming data real-time. |
+| CREATE | `.add(Map<String, dynamic>)` | Menambah dokumen baru dengan Auto-ID. |
+| UPDATE | `.doc(id).update(Map)` | Update sebagian data berdasarkan doc_id. |
+| DELETE | `.doc(id).delete()` | Menghapus dokumen berdasarkan doc_id. |
 
 ---
 
 ## 🧠 Analisis Kode & Logika Program
 
-Berikut analisis teknis mendalam untuk setiap modul aplikasi:
+Berikut analisis teknis mendalam untuk modul-modul dalam aplikasi:
 
 ---
 
 ## 1. Entry Point & Konfigurasi (lib/main.dart)
 
-### Komponen Kode  
+### Komponen Kode
 **ensureInitialized()**  
-• *Flutter Engine Binding*  
-• Dipanggil sebelum `runApp()` karena Firebase perlu diinisialisasi melalui native channel.
+• Flutter Engine Binding  
+• Harus dipanggil sebelum `runApp()` untuk menyiapkan integrasi native dan Firebase.
 
 **Firebase.initializeApp**  
-• *Async Initialization*  
-• Menghubungkan aplikasi dengan Firebase sebelum UI dirender.  
-• `await` mencegah race condition ketika database belum siap.
+• Async Initialization  
+• Menghubungkan proyek Flutter dengan Firebase Cloud sebelum UI berjalan.
 
 **ThemeData**  
-• *Global Styling*  
-• Menggunakan satu sumber tema global untuk warna dan style input (DRY Principle).
+• Global Styling  
+• Style aplikasi dibuat terpusat (warna coklat 0xFF5D4037, rounded input).  
+• Mengikuti prinsip DRY: 1 perubahan → seluruh UI ikut berubah.
 
 ---
 
 ## 2. Halaman Login (lib/pages/login_page.dart)
 
-### Komponen Kode  
+### Komponen Kode
 **signInWithEmailAndPassword**  
-• *Token-Based Auth*  
-• Mengirim email & password ke server Firebase dan menerima Auth Token.
+• Token-Based Auth  
+• Mengirim kredensial ke server Google dan menerima Auth Token.
 
 **pushReplacement**  
-• *Stack Management*  
-• Menghapus halaman login dari stack agar user tidak bisa kembali ke sana setelah login.
+• Stack Management  
+• Menghapus halaman Login dari stack agar user tidak kembali ke form login setelah sukses login.
 
 **try-catch**  
-• *Exception Handling*  
-• Menangkap error Firebase seperti *wrong-password*, *user-not-found*, lalu menampilkan SnackBar ramah pengguna.
+• Exception Handling  
+• Menampil­kan error Firebase dengan SnackBar ramah user.
 
 ---
 
 ## 3. Halaman Registrasi (lib/pages/register_page.dart)
 
-### Komponen Kode  
+### Komponen Kode
 **_isLoading**  
-• Menghindari race condition (double-click) saat tombol ditekan berulang.  
-• Sementara loading, tombol berubah menjadi spinner.
+• Race Condition Control  
+• Mencegah user klik tombol register berkali-kali (hindari duplikasi akun).
 
 **createUser...**  
-• *Server-Side Creation*  
-• Membuat akun baru di Firebase Authentication.
+• Server-Side Account Creation  
+• Firebase memvalidasi email, password, dan membuat record akun.
 
 **Navigator.pop**  
-• Mengembalikan user ke halaman Login setelah registrasi sukses.
+• Navigation Stack  
+• Setelah register selesai, user dikembalikan ke Login Page.
 
 ---
 
 ## 4. Halaman Utama / Dashboard (lib/pages/home_page.dart)
 
-### Komponen Kode  
+### Komponen Kode
 **StreamBuilder**  
-• *Reactive Programming*  
-• Terhubung ke Firestore Real-time Stream → UI auto update tanpa refresh.  
-• Berbeda dengan `FutureBuilder` yang hanya sekali ambil data.
+• Reactive Programming  
+• Membuka koneksi WebSocket ke Firestore.  
+• UI auto-update jika data di server berubah.
 
 **ListView.builder**  
-• *Memory Optimization*  
-• Menggunakan lazy loading & recycling widget agar tetap ringan meskipun ribuan data.
+• Memory Optimization  
+• Menggunakan lazy-loading, hanya item yang terlihat di-render.
 
 **_deleteBook**  
-• Menghapus dokumen berdasarkan ID:  
-`doc(id).delete()`  
-• Karena StreamBuilder aktif, UI langsung update setelah data terhapus.
+• Direct Document Access  
+• Menghapus dokumen berdasarkan ID.  
+• Karena memakai stream, UI otomatis menghilangkan item tanpa setState().
 
 ---
 
 ## 5. Halaman Form Buku (lib/pages/form_book_page.dart)
 
-Halaman ini bersifat *polimorfik*, digunakan untuk **Tambah** dan **Edit** sekaligus.
+Halaman ini bersifat **polimorfik**: digunakan untuk **Tambah** dan **Edit** data.
 
-### Komponen Kode  
+### Komponen Kode
 **initState**  
-• *Lifecycle Hook*  
-• Pre-fill form ketika mode Edit (`widget.bookData != null`).
+• Lifecycle Hook  
+• Melakukan pre-fill input saat mode Edit.
 
 **_parseNumber**  
-• *Data Sanitization*  
-• Membersihkan input angka yang mengandung titik, koma, atau simbol (Regex `[^0-9]`).
+• Data Sanitization  
+• Membersihkan input angka dari simbol seperti Rp, titik, koma  
+(Regex `[^0-9]` untuk menjaga database tetap type-safe).
 
 **_isEdit logic**  
-• Menentukan apakah memanggil  
-`collection.add()` atau `collection.doc(id).update()`  
-• Mengurangi duplikasi logic hingga 50%.
+• Conditional Logic  
+• Memilih jalur eksekusi: tambah (`add()`) atau edit (`update()`).  
+• Mengurangi duplikasi kode secara signifikan.
 
 ---
 
-## 📡 Spesifikasi Data (Firestore NoSQL)
+## 🗃️ Spesifikasi Data (Firestore NoSQL)
 
-Aplikasi menggunakan model NoSQL (Dokumen) untuk koleksi `books`.
+Aplikasi menggunakan struktur dokumen dalam koleksi `books`.
 
 | Field | Tipe Data | Fungsi |
-|-------|-----------|--------|
+|--------|-----------|--------|
 | judul | String | Nama buku |
-| harga | Number (Int) | Harga (integer murni) |
+| harga | Number (Int) | Angka murni untuk perhitungan |
 | jumlah | Number (Int) | Stok buku |
-| volume | Number (Int) | Volume/tebal buku |
+| volume | Number (Int) | Informasi ketebalan/halaman |
 | tanggal_masuk | String | Tanggal pencatatan (YYYY-MM-DD) |
-| penulis | String | Nama penulis |
-| penerbit | String | Nama penerbit |
+| penulis | String | Metadata penulis |
+| penerbit | String | Metadata penerbit |
 
 ---
 
