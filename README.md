@@ -87,5 +87,5 @@ Strutur koleksi `books` :
 |penerbit | string | Nama Penerbit |
 
 ### 📱Demo Aplikasi 
-![Demo Aplikasi Responsi 2 Paket 3](assets/DemoAplikasi.gif)
+![Demo Aplikasi Responsi 2 Paket 3](assets/Demo_Aplikasi.gif)
 
